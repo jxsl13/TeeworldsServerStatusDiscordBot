@@ -4,6 +4,9 @@
 deploy:
 	docker-compose up -d --build
 
+redeploy:
+	docker-compose up -d --force-recreate --build
+
 
 build:
 	go build .
