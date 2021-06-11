@@ -10,6 +10,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v2/bot"
 	"github.com/diamondburned/arikawa/v2/gateway"
+	"github.com/jxsl13/TeeworldsServerStatusDiscordBot/markdown"
 	configo "github.com/jxsl13/simple-configo"
 	"github.com/jxsl13/twapi/browser"
 )
@@ -55,12 +56,18 @@ func main() {
 					if err != nil {
 						return err
 					}
+
+					updateMessage := ""
+
 					serverInfo, err := browser.GetServerInfoWithTimeout(ip, port, cfg.RefreshInterval)
 					if err != nil {
-						return err
+						updateMessage = fmt.Sprintf("%s: %s", markdown.WrapInFat("[DOWN]"), address)
+						log.Println(err)
+					} else {
+						updateMessage = formatServerInfo(serverInfo)
 					}
 
-					msg, err = ctx.EditMessage(channelID, msgID, formatServerInfo(serverInfo), nil, true)
+					msg, err = ctx.EditMessage(channelID, msgID, updateMessage, nil, true)
 					if err != nil {
 						return err
 					}
