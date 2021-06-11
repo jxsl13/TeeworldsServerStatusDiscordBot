@@ -18,6 +18,8 @@ type Config struct {
 
 	Servers         []string
 	RefreshInterval time.Duration
+
+	CustomFlags map[string]string
 }
 
 func (c *Config) Name() string {
@@ -37,6 +39,8 @@ func discordChannelIDParser(out *discord.ChannelID) configo.ParserFunc {
 
 func (c *Config) Options() configo.Options {
 	listDelimiter := ","
+	pairDelimiter := ";"
+	keyValueDelimiter := "->"
 	return []configo.Option{
 		{
 			Key:           "DISCORD_TOKEN",
@@ -67,6 +71,12 @@ func (c *Config) Options() configo.Options {
 			Description:   "Interval until the server status message is refreshed again.",
 			DefaultValue:  "10s",
 			ParseFunction: parsers.Duration(&c.RefreshInterval),
+		},
+		{
+			Key:           "CUSTOM_FLAGS",
+			Description:   "Add custom flag mappings: 'default-><:default:853002988364103750>;XSC-><:default:853002988364103750>'",
+			DefaultValue:  "default-><:default:853002988364103750>",
+			ParseFunction: parsers.Map(&c.CustomFlags, &pairDelimiter, &keyValueDelimiter),
 		},
 	}
 }

@@ -272,3 +272,20 @@ func Flag(value int) string {
 	}
 	return ":flag_" + strings.ToLower(flags[value]) + ":"
 }
+
+func FlagsWithCustomConfig(value int, customMap map[string]string) string {
+	countryTag := flags[value]
+
+	customEmoji, exists := customMap[countryTag]
+	if exists {
+		return customEmoji
+	}
+
+	flagTag := Flag(value)
+	customEmoji, exists = customMap[countryTag]
+	if exists {
+		return customEmoji
+	}
+
+	return flagTag
+}

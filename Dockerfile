@@ -23,6 +23,7 @@ ENV DISCORD_CHANNEL_ID=""
 ENV DICORD_OWNER=""
 ENV TEEWORLDS_SERVERS=""
 ENV REFRESH_INTERVAL="60s"
+ENV CUSTOM_FLAGS=""
 
 WORKDIR /app
 COPY --from=build /build/tw-server-status-discord-bot .

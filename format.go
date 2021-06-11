@@ -34,7 +34,7 @@ func formatServerInfo(serverInfo browser.ServerInfo) string {
 	clanFmtStr := fmt.Sprintf("%%-%ds", longestClan)
 
 	for _, player := range serverInfo.Players {
-		flag := markdown.Flag(player.Country)
+		flag := markdown.FlagsWithCustomConfig(player.Country, cfg.CustomFlags)
 		name := markdown.WrapInInlineCodeBlock(fmt.Sprintf(nameFmtStr, player.Name))
 		clan := markdown.WrapInInlineCodeBlock(fmt.Sprintf(clanFmtStr, player.Clan))
 
