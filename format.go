@@ -19,7 +19,7 @@ func formatServerInfo(serverInfo browser.ServerInfo) string {
 			longestName = len([]rune(player.Name))
 		}
 
-		if len([]rune(player.Clan)) > longestName {
+		if len([]rune(player.Clan)) > longestClan {
 			longestName = len([]rune(player.Clan))
 		}
 	}
