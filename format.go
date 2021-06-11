@@ -24,7 +24,8 @@ func formatServerInfo(serverInfo browser.ServerInfo) string {
 		}
 	}
 
-	header := fmt.Sprintf("%s (%d/%d)", markdown.WrapInInlineCodeBlock(serverInfo.Name), serverInfo.NumPlayers, serverInfo.MaxPlayers)
+	header := fmt.Sprintf("%s (%d/%d)", markdown.Escape(serverInfo.Name), serverInfo.NumPlayers, serverInfo.MaxPlayers)
+	header = markdown.WrapInFat(header)
 
 	sb.WriteString(header)
 	sb.WriteString("\n")

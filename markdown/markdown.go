@@ -37,7 +37,7 @@ func WrapInInlineCodeBlock(text string) string {
 }
 
 func WrapInFat(text string) string {
-	return WrapInCustom(text, "*")
+	return WrapInCustom(text, "**")
 }
 
 func WrapInCustom(text, wrap string) (result string) {
