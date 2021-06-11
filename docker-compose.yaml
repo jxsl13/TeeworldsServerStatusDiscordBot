@@ -1,0 +1,17 @@
+version: "2.4"
+
+services:
+  
+  # monitor of teeworlds servers
+  dc_bot:
+    container_name: tw_server_status
+    build: .
+    restart: unless-stopped
+    environment:
+        DISCORD_TOKEN: ${DISCORD_TOKEN:?err}
+        DISCORD_CHANNEL_ID: ${DISCORD_CHANNEL_ID:?err}
+        DICORD_OWNER: ${DICORD_OWNER:?err}
+        TEEWORLDS_SERVERS: ${TEEWORLDS_SERVERS:?err}
+        REFRESH_INTERVAL: ${REFRESH_INTERVAL:?err}
+
+  
