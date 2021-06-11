@@ -32,15 +32,23 @@ func Escape(userInput string) string {
 }
 
 // WrapInInlineCodeBlock puts the user input into a inline codeblock that is properly escaped.
-func WrapInInlineCodeBlock(userInput string) (userOutput string) {
-	if userInput == "" {
+func WrapInInlineCodeBlock(text string) string {
+	return WrapInCustom(text, "`")
+}
+
+func WrapInFat(text string) string {
+	return WrapInCustom(text, "*")
+}
+
+func WrapInCustom(text, wrap string) (result string) {
+	if text == "" {
 		return ""
 	}
-	numberBackticks := strings.Count(userInput, "`") + 1
 
-	userOutput = userInput
-	for idx := 0; idx < numberBackticks; idx++ {
-		userOutput = fmt.Sprintf("`%s`", userOutput)
+	numWraps := strings.Count(text, wrap) + 1
+	result = text
+	for idx := 0; idx < numWraps; idx++ {
+		result = fmt.Sprintf("%s%s%s", wrap, result, wrap)
 	}
-	return
+	return result
 }
