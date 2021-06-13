@@ -6,6 +6,10 @@
 - Docker
 - Docker Compose
 
+or
+
+- Go compiler
+
 (can also be used as standalone executable)
 
 ## Configuration:
@@ -20,9 +24,22 @@ CUSTOM_FLAGS=flag-><:custom_emoji:123456>
 ```
 
 ## Deploy
+
+### Docker Compose
 Execute the first target in the `Makefile` with the following command.
 ```
 make
+```
+
+### Standalone executable
+Compile the project
+```
+make build
+```
+
+Start the application
+````
+./TeeworldsServerStatusDiscordBot --env-file .env
 ```
 
 
