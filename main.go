@@ -4,17 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
-	"regexp"
-	"strconv"
-	"strings"
 	"time"
 
-	"github.com/diamondburned/arikawa/v2/bot"
 	"github.com/diamondburned/arikawa/v2/discord"
-	"github.com/diamondburned/arikawa/v2/gateway"
 	"github.com/go-co-op/gocron"
 	"github.com/joho/godotenv"
+	"github.com/jxsl13/TeeworldsServerStatusDiscordBot/bot"
 	"github.com/jxsl13/TeeworldsServerStatusDiscordBot/markdown"
 	configo "github.com/jxsl13/simple-configo"
 	"github.com/jxsl13/twapi/browser"
@@ -23,14 +18,14 @@ import (
 var (
 	cfg             = &Config{}
 	scheduler       = gocron.NewScheduler(time.UTC)
-	addressMsgIDMap map[string]discord.MessageID
+	addressMsgIDMap = make(map[string]discord.MessageID)
 )
 
 func init() {
 	useEnvFile := flag.String("env-file", "", "--env-file .env")
 	flag.Parse()
 
-	env := make(map[string]string)
+	var env map[string]string
 	var err error
 
 	if *useEnvFile != "" {
@@ -47,15 +42,16 @@ func init() {
 	}
 
 	scheduler.TagsUnique()
-	addressMsgIDMap = make(map[string]discord.MessageID)
 }
 
 func main() {
 
-	bot.Run(cfg.DiscordToken, &Bot{Cfg: cfg, AddressMsgIDMap: addressMsgIDMap},
+	bot.RunWithShutdownCallback(cfg.DiscordToken, &Bot{Cfg: cfg},
 		func(ctx *bot.Context) error {
+			// prefix handling
 			ctx.HasPrefix = NewRBACPrefix(cfg)
 
+			// init messages for all servers
 			for _, address := range cfg.Servers {
 				// imporant line, don't touch
 				address := address
@@ -67,16 +63,15 @@ func main() {
 					continue
 				}
 
-				channelID := cfg.DiscordChannelID
-				msgID := msg.ID
-
-				addressMsgIDMap[address] = msgID
+				// save initialized message ids
+				addressMsgIDMap[address] = msg.ID
 
 				ip, port, err := toIPAndPort(address)
 				if err != nil {
 					return err
 				}
 
+				// create a scheduler for every message
 				scheduler.
 					Every(cfg.RefreshInterval).
 					Tag(address).
@@ -100,57 +95,18 @@ func main() {
 							}
 
 						},
-						channelID, msgID, ip, port)
+						cfg.DiscordChannelID, msg.ID, ip, port)
 			}
 
+			// start scheduler
 			scheduler.
 				StartAt(time.Now().Add(time.Second)).
 				StartAsync()
 			return nil
 		},
+		func(ctx *bot.Context) {
+			// shutdown callback
+			deleteMyMessages(ctx, cfg.DiscordChannelID)
+		},
 	)
-
-}
-
-var splitRegex = regexp.MustCompile(`(.+):(\d+)`)
-
-func toIPAndPort(address string) (string, int, error) {
-	matches := splitRegex.FindStringSubmatch(address)
-	if len(matches) == 0 {
-		return "", 0, fmt.Errorf("invalid address: %s", address)
-	}
-	ip := matches[1]
-	port, err := strconv.Atoi(matches[2])
-	if err != nil {
-		return "", 0, err
-	}
-
-	return ip, port, nil
-}
-
-type Bot struct {
-	Ctx             *bot.Context
-	Cfg             *Config
-	AddressMsgIDMap map[string]discord.MessageID
-}
-
-func (b *Bot) Stop(event *gateway.MessageCreateEvent) (string, error) {
-	for _, msgID := range b.AddressMsgIDMap {
-		b.Ctx.DeleteMessage(b.Cfg.DiscordChannelID, msgID)
-	}
-	b.Ctx.DeleteMessage(event.ChannelID, event.Message.ID)
-
-	b.Ctx.CloseGracefully()
-	os.Exit(0)
-	return "", nil
-}
-
-func NewRBACPrefix(config *Config) bot.Prefixer {
-	return func(msg *gateway.MessageCreateEvent) (string, bool) {
-
-		if strings.HasPrefix(msg.Content, "#") && config.Owner == msg.Author.Tag() {
-			return "#", true
-		}
-		return "", false
-	}
 }
