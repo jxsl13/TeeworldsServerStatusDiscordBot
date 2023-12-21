@@ -5,12 +5,17 @@ import (
 	"strconv"
 )
 
+// https://github.com/teeworlds/teeworlds/blob/a1911c8f7d8458fb4076ef8e7651e8ef5e91ab3e/datasrc/countryflags/index.json#L30
+// https://github.com/ddnet/ddnet/blob/e0052c3aec74490c328ef6205917016974d790d4/data/countryflags/index.txt#L32
 var flags = map[int][]string{
 	737: {"ss", ":flag_ss:"},
-	901: {"xen", ":england:"},        // XEN - England
-	902: {"xni", ":flag_je:"},        // XNI - Northern Ireland
-	903: {"xsc", ":scotland:"},       // XSC - Scotland
-	904: {"xwa", ":wales:"},          // XWA - Wales
+	901: {"gb-eng", ":england:"},  // XEN - England
+	902: {"gb-nir", ":flag_je:"},  // XNI - Northern Ireland
+	903: {"gb-sct", ":scotland:"}, // XSC - Scotland
+	904: {"gb-wls", ":wales:"},    // XWA - Wales
+	905: {"eu", ":flag_eu:"},
+	906: {"es-ct", ":flag_es:"},
+	907: {"es-ga", ":flag_es:"},
 	950: {"xbz", ":flag_es:"},        // XBZ - Balearic Islands
 	951: {"xca", ":flag_es:"},        // XCA - Catalonia
 	952: {"xes", ":flag_es:"},        // XES - Spain
@@ -264,6 +269,11 @@ var flags = map[int][]string{
 	744: {"sj", ":flag_sj:"},
 	581: {"um", ":flag_um:"},
 	175: {"yt", ":flag_yt:"},
+}
+
+func KnownFlag(code int) bool {
+	_, found := flags[code]
+	return found
 }
 
 // Flag returns a string representation of a given flag value
